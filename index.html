@@ -13,62 +13,31 @@
       <h1 class="title">Clipboard</h1>
       <template v-if="copied.length">
         <ul class="list-group clipboard-list">
-          <!-- <li class="list-group-item" v-for="(item, index) in listPin" :key="`ix_${index}`">
-            <section>
-              <textarea @click="setClipboard(item)" class="form-control" readonly id="exampleFormControlTextarea1" rows="4" v-html="item.content"></textarea>
-              <div class="clipboard-menu">
-                <div class="dropdown">
-                  <a href="#" id="dropdownMenuButton" class="text-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" style="width: 1.3rem" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-                    </svg>
-                  </a>
-                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" @click.prevent="remove(item.id)">Delete</a>
-                    <a class="dropdown-item" @click.prevent="togglePin(item.id, false)">Unpin</a>
-                  </div>
-                </div>
-              </div>
-              <div class="pinned">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" style="width: 1.3rem" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59" />
-                </svg>
-              </div>
-            </section>
-          </li>
-          <li class="list-group-item" v-for="(item, index) in list" :key="index">
-            <section>
-              <textarea @click="setClipboard(item)" class="form-control" readonly id="exampleFormControlTextarea1" rows="4" v-html="item.content"></textarea>
-              <div class="clipboard-menu">
-                <div class="dropdown">
-                  <a href="#" id="dropdownMenuButton" class="text-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" style="width: 1.3rem" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-                    </svg>
-                  </a>
-                  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="#" @click.prevent="remove(item.id)" href="#">Delete</a>
-                    <a class="dropdown-item" href="#" @click.prevent="togglePin(item.id, true)">Pin</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#" @click.prevent="destroy">Clear all</a>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </li> -->
           <li class="list-group-item" v-for="(item, ix) in listCopied" :key="ix">
             <section>
-              <textarea
-                @click="setClipboard(item)"
-                :class="{
-                'form-control': true,
-                'active': index == ix
-              }"
-                readonly
-                id="exampleFormControlTextarea1"
-                rows="4"
-                v-html="item.content"
-              ></textarea>
+              <div @mouseover="handleHover(ix)" @click="setClipboard(item)">
+                <div
+                  class="w-100"
+                  :class="{
+                  'review-image': true,
+                  'active': index == ix
+                }"
+                  v-if="item.type == 'image'"
+                >
+                  <img :src="item.content" class="img-fluid" />
+                </div>
+                <textarea
+                  v-else
+                  :class="{
+                  'form-control': true,
+                  'active': index == ix
+                }"
+                  readonly
+                  id="exampleFormControlTextarea1"
+                  rows="4"
+                  v-html="item.content"
+                ></textarea>
+              </div>
               <div class="clipboard-menu">
                 <div class="dropdown">
                   <a href="#" id="dropdownMenuButton" class="text-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

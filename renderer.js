@@ -27,13 +27,13 @@ const app = new Vue({
           break
 
         case 40:
-          if (this.index < this.listCopied.length) {
+          if (this.index < this.listCopied.length - 1) {
             this.index = this.index + 1
           }
           break
 
         case 13:
-          window.bridge.setClipboard(this.listCopied[this.index].content)
+          window.bridge.setClipboard(this.listCopied[this.index])
           this.index = 0
           break
       }
@@ -54,15 +54,20 @@ const app = new Vue({
     }
   },
   methods: {
+    handleHover(index) {
+      this.index = index
+    },
     remove(id) {
       const index = this.copied.findIndex(el => el.id == id)
       if (index != -1) {
+        const item = this.copied[index]
         this.copied = [...this.copied.slice(0, index), ...this.copied.slice(index + 1)]
-        this.updateCopied()
+        // this.updateCopied()
+        window.bridge.removeCopied(item)
       }
     },
     setClipboard(item) {
-      window.bridge.setClipboard(item.content)
+      window.bridge.setClipboard(item)
     },
     togglePin(id, toggle = true) {
       const index = this.copied.findIndex(el => el.id == id)
@@ -76,11 +81,11 @@ const app = new Vue({
           },
           ...this.copied.slice(index + 1)
         ]
-        this.updateCopied()
+        window.bridge.updateCopied({
+          ...item,
+          pin: toggle
+        })
       }
-    },
-    updateCopied() {
-      window.bridge.updateCopied(this.copied)
     },
     destroy() {
       this.copied = []

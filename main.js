@@ -13,11 +13,10 @@ function createWindow() {
   const height = display.bounds.height
 
   global.win = new BrowserWindow({
-    width: 350,
-    height: 600,
-    width: 350,
-    x: width - 350,
-    y: height - 600,
+    width: 380,
+    height: 800,
+    x: width - 380,
+    y: height - 800,
     resizable: false,
     movable: false,
     minimizable: false,
@@ -46,7 +45,7 @@ function createWindow() {
   win.hide()
 
   // Open the DevTools.
-  // win.webContents.openDevTools()
+  win.webContents.openDevTools()
   win.on('close', function (event) {
     if (!global.quit) {
       event.preventDefault()
@@ -87,25 +86,11 @@ function createTray() {
       click: () => {
         global.win.show()
       }
-      // submenu: [
-      //   {
-      //     label: 'Open Google',
-      //     click: (item, window, event) => {
-      //       //console.log(item, event);
-      //       global.win.show()
-      //     }
-      //   }
-      // ]
     },
     {
       label: 'Start with system',
       click: menuItem => {
         autoLaunch.toggle()
-        // const index = template.findIndex(item => item.label === menuItem.label)
-        // setTimeout(() => {
-        //   template[index].checked = autoLaunch.isEnabled()
-        //   reloadContextMenu()
-        // })
       },
       type: 'checkbox',
       checked: autoLaunch.isEnabled()
@@ -130,7 +115,7 @@ function createTray() {
     show: false,
     webPreferences: { offscreen: true }
   })
-  icons.loadURL('https://trends.google.com/trends/hottrends/visualize')
+  icons.loadURL('http://www.blankwebsite.com/')
   icons.webContents.on('paint', (event, dirty, image) => {
     if (tray) tray.setImage(image.resize({ width: 16, height: 16 }))
   })
@@ -142,16 +127,26 @@ function createTray() {
   })
 
   ipcMain.on('clearCopied', (event, data) => {
-    setCopied([])
+    db.get('copied').remove({}).write()
   })
 
   ipcMain.on('updateCopied', (event, data) => {
-    setCopied(data)
+    db.get('copied').find({ id: data.id }).assign(data).write()
   })
 
-  ipcMain.on('setClipboard', (events, args) => {
-    clipboard.writeText(args)
-    persistCopied(args)
+  ipcMain.on('removeCopied', (event, { id }) => {
+    db.get('copied').remove({ id }).write()
+  })
+
+  ipcMain.on('setClipboard', (events, { content, type }) => {
+    console.log({ content, type })
+    if (type == 'text') {
+      clipboard.writeText(content)
+    } else if (type == 'image') {
+      console.log({ type })
+      clipboard.writeImage(nativeImage.createFromDataURL(content))
+    }
+    persistCopied(content)
     win.close()
   })
 }
@@ -176,19 +171,28 @@ function setCopied(copied = []) {
 }
 
 function startMonitoringClipboard() {
-  let previousText = clipboard.readText()
+  let previousText = getClipboard()
 
   const textChanged = () => {
-    const newText = clipboard.readText()
+    const newText = getClipboard()
+    const copy = db.get('copied').filter({ content: newText }).value()
+    if (copy.length) {
+      if (copy[0].pin) {
+        return
+      }
+      db.get('copied').remove({ id: copy[0].id }).write()
+    }
     const { copied } = getCopiedFromDb()
-    setCopied([
+    const newCopied = [
       {
         id: uuid.v4(),
         content: newText,
-        pin: false
+        pin: false,
+        type: getClipboardType()
       },
       ...copied
-    ])
+    ].slice(0, getCopiedQty())
+    setCopied(newCopied)
     win.webContents.send('setCopied', getCopiedFromDb())
   }
 
@@ -196,9 +200,29 @@ function startMonitoringClipboard() {
     return str2 && str1 !== str2
   }
 
+  function getClipboard() {
+    if (clipboard.availableFormats().indexOf('text/plain') != -1) {
+      return clipboard.readText()
+    } else if (clipboard.availableFormats().indexOf('image/png') != -1 || clipboard.availableFormats().indexOf('image/jpeg') != -1) {
+      return clipboard.readImage('clipboard').toDataURL()
+    } else {
+      return clipboard.readText()
+    }
+  }
+
+  function getClipboardType() {
+    if (clipboard.availableFormats().indexOf('text/plain') != -1) {
+      return 'text'
+    } else if (clipboard.availableFormats().indexOf('image/png') != -1 || clipboard.availableFormats().indexOf('image/jpeg') != -1) {
+      return 'image'
+    } else {
+      return 'text'
+    }
+  }
+
   if (!watcherId) {
     watcherId = setInterval(() => {
-      if (isDiffText(previousText, (previousText = clipboard.readText()))) textChanged()
+      if (isDiffText(previousText, (previousText = getClipboard()))) textChanged()
     }, 500)
   }
 }

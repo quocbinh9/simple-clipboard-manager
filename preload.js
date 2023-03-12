@@ -26,6 +26,9 @@ contextBridge.exposeInMainWorld(
     updateCopied: payload => {
       ipcRenderer.sendSync('updateCopied', payload)
     },
+    removeCopied: payload => {
+      ipcRenderer.sendSync('removeCopied', payload)
+    },
     setClipboard: copy => {
       ipcRenderer.sendSync('setClipboard', copy)
     }
