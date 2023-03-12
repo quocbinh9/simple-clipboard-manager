@@ -45,7 +45,7 @@ function createWindow() {
   win.hide()
 
   // Open the DevTools.
-  win.webContents.openDevTools()
+  // win.webContents.openDevTools()
   win.on('close', function (event) {
     if (!global.quit) {
       event.preventDefault()
@@ -139,11 +139,9 @@ function createTray() {
   })
 
   ipcMain.on('setClipboard', (events, { content, type }) => {
-    console.log({ content, type })
     if (type == 'text') {
       clipboard.writeText(content)
     } else if (type == 'image') {
-      console.log({ type })
       clipboard.writeImage(nativeImage.createFromDataURL(content))
     }
     persistCopied(content)
