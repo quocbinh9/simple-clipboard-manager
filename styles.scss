@@ -1,0 +1,80 @@
+html,
+body {
+    font-size: 15px;
+    background-color: #e5e5e5;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+#app {
+    .no-content {
+        padding: 0.75rem;
+        span {
+            text-align: center;
+            display: block;
+            border-radius: unset;
+            &:hover {
+                background: white;
+            }
+        }
+    }
+    .title {
+        font-size: 18px;
+        font-weight: normal;
+        display: block;
+        padding: 0.75rem;
+        margin-bottom: unset;
+    }
+    .clipboard-list {
+        .list-group-item {
+            .pinned {
+                position: absolute;
+                bottom: 5px;
+                right: 5px;
+            }
+            border-width: 0;
+            border: unset;
+            padding-right: 0.75rem;
+            padding-left: 0.75rem;
+            padding-top: unset;
+            background-color: #e5e5e5;
+            textarea {
+                cursor: pointer;
+                resize: none;
+                border-radius: unset;
+                padding-right: 1.5rem;
+                background-color: white;
+                transition: border-color 0.2s cubic-bezier(0.55, 0.085, 0.68, 0.53),
+                    box-shadow 0.2s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+                // &:hover {
+                //     border-color: #80bdff;
+                //     outline: 0;
+                //     box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
+                // }
+                &:focus {
+                    border-color: unset;
+                    outline: 0;
+                    box-shadow: unset;
+                }
+                &.active {
+                    border-color: #80bdff;
+                    outline: 0;
+                    box-shadow: 0 0 0 0.2rem rgb(0 123 255 / 25%);
+                }
+            }
+            section {
+                position: relative;
+            }
+            .clipboard-menu {
+                position: absolute;
+                top: 5px;
+                right: 5px;
+            }
+        }
+    }
+}

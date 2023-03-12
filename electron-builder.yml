@@ -1,0 +1,5 @@
+appId: 'github.com/clipboard-manager'
+artifactName: ${name}-${version}-${os}-${arch}.${ext}
+productName: 'Simple Clipboard Manager'
+publish: {provider: github, releaseType: draft, vPrefixedTagName: true}
+forceCodeSigning: false
